@@ -58,5 +58,20 @@ const updateValues = (productRefs, updatedValues, tenant) => {
   return batch.commit()
 }
 
-module.exports = {getAllProducts, getProductRefs, updateValues}
+const getProducts = (tenant, productId) => {
+  const productCollection = getProductCollection(tenant)
+  return productCollection
+    .where("bu_product_id", "==", productId)
+    .get()
+    .then(snapshot => getDataFromSnapshot(snapshot));
+}
+
+const addVariant = async (variant, scId, tenant) => {
+  const productCollection = getProductCollection(tenant)
+  return await productCollection
+    .doc(scId)
+    .set(variant)
+};
+
+module.exports = {getAllProducts, getProductRefs, updateValues, getProducts, addVariant}
 
