@@ -4,6 +4,7 @@ const TENANTS = ['FACL', 'FAPE', 'FAAR', 'FACO'];
 const DEFAULT_TENANT = 'FACL';
 const ORDER_BY_FIELD = 'sc_id';
 const PRODUCT_ID_FIELD = "bu_product_id"
+const SKU_ID_FIELD = "bu_sku_id"
 
 
 module.exports = {
@@ -13,4 +14,5 @@ module.exports = {
   DEFAULT_TENANT,
   ORDER_BY_FIELD,
   PRODUCT_ID_FIELD,
+  SKU_ID_FIELD
 }

@@ -73,5 +73,20 @@ const addVariant = async (variant, scId, tenant) => {
     .set(variant)
 };
 
-module.exports = {getAllProducts, getProductRefs, updateValues, getProducts, addVariant}
+
+const getDocRef = async (field, value, tenant) => {
+  const productCollection = getProductCollection(tenant)
+  const collectionRefs = await productCollection.where(field, "==", value).get();
+  const result = []
+  collectionRefs.forEach(collectionRef => result.push(collectionRef.id));
+  return result[0];
+}
+
+const deleteRef = (ref, tenant) => {
+  console.log(ref, tenant)
+  const productCollection = getProductCollection(tenant)
+  return productCollection.doc(ref).delete()
+}
+
+module.exports = {getAllProducts, getProductRefs, updateValues, getProducts, addVariant, getDocRef, deleteRef}
 

@@ -1,5 +1,14 @@
-const {getAllProducts, getProductRefs, updateValues, getProducts, addVariant} = require("./firestore")
+const {
+  getAllProducts,
+  getProductRefs,
+  updateValues,
+  getProducts,
+  addVariant,
+  deleteRef,
+  getDocRef
+} = require("./firestore")
 const {getUTCTimeStamp} = require("./dateUtils")
+const {SKU_ID_FIELD, PRODUCT_ID_FIELD} = require("./constants")
 
 const sendResponse = (res, code, body) => {
   res.status(code);
@@ -32,7 +41,6 @@ const updateProductDetails = async (req, res) => {
 const handleProduct = async (req, res) => {
   const {tenant} = req.query;
   const {productId} = req.params;
-  console.log(tenant, productId)
   try {
     const products = await getProducts(tenant, productId)
     sendResponse(res, 200, products)
@@ -62,12 +70,35 @@ const addVariantHandler = async (req, res) => {
 
   try {
     await addVariant(newVariant, scId, tenant)
-    sendResponse(res, 200)
+    sendResponse(res, 201)
   } catch (e) {
     console.error(e)
     sendResponse(res, 500, e)
   }
 }
 
+const deleteHandler = async (req, res, field) => {
+  const {id} = req.params
+  const {tenant} = req.query
+  try {
+    const docRef = await getDocRef(field, id, tenant)
+    await deleteRef(docRef, tenant)
+    sendResponse(res, 204)
+  } catch (e) {
+    console.error(e)
+    sendResponse(res, 500, e)
+  }
+};
 
-module.exports = {handleAllProducts, updateProductDetails, handleProduct, addVariantHandler}
+const deleteVariantHandler = (req, res) => deleteHandler(req, res, SKU_ID_FIELD)
+
+const deleteProductHandler = (req, res) => deleteHandler(req, res, PRODUCT_ID_FIELD)
+
+module.exports = {
+  handleAllProducts,
+  updateProductDetails,
+  handleProduct,
+  addVariantHandler,
+  deleteVariantHandler,
+  deleteProductHandler
+}
