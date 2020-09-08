@@ -5,7 +5,8 @@ const {
   handleProduct,
   addVariantHandler,
   deleteVariantHandler,
-  deleteProductHandler
+  deleteProductHandler,
+  importCoreCatelogHandler
 } = require("./productsHandler")
 const bodyParser = require("body-parser");
 
@@ -19,6 +20,7 @@ app.get("/products/:productId", handleProduct)
 app.post("/variant/create", addVariantHandler)
 app.delete("/variant/:id", deleteVariantHandler)
 app.delete("/product/:id", deleteProductHandler)
+app.post("/import/core-catelog", importCoreCatelogHandler)
 
 app.listen(port, () => {
   console.log(`listening at http://localhost:${port}`);

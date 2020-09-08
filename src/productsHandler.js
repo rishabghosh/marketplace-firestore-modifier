@@ -50,10 +50,8 @@ const handleProduct = async (req, res) => {
   }
 }
 
-const addVariantHandler = async (req, res) => {
-  const {name, productId, variantId, categoryId, tenant} = req.body;
-  const scId = `${productId}-${variantId}`;
-  const newVariant = {
+const createVariantData = (name, variantId, tenant, categoryId, productId, scId) => {
+  return {
     "sc_product_title": name,
     "sc_sku_id": variantId,
     "sc_operator_code": tenant,
@@ -67,6 +65,12 @@ const addVariantHandler = async (req, res) => {
     "last_modified_date": getUTCTimeStamp(),
     "bu_product_id": productId
   }
+}
+
+const addVariantHandler = async (req, res) => {
+  const {name, productId, variantId, categoryId, tenant} = req.body;
+  const scId = `${productId}-${variantId}`;
+  const newVariant = createVariantData(name, variantId, tenant, categoryId, productId, scId)
 
   try {
     await addVariant(newVariant, scId, tenant)
@@ -94,11 +98,32 @@ const deleteVariantHandler = (req, res) => deleteHandler(req, res, SKU_ID_FIELD)
 
 const deleteProductHandler = (req, res) => deleteHandler(req, res, PRODUCT_ID_FIELD)
 
+const importCoreCatelogHandler = async (req, res) => {
+  const {id: productId, defaultParentCategoryId: categoryId, variants} = req.body;
+  const {tenant} = req.query
+
+  const allVariants = variants.map(variant => {
+    const {id: variantId, name} = variant;
+    const scId = `${productId}-${variantId}`;
+    const newVariant = createVariantData(name, variantId, tenant, categoryId, productId, scId)
+    return addVariant(newVariant, scId, tenant)
+  })
+
+  try {
+    await Promise.all(allVariants)
+    sendResponse(res, 201)
+  } catch (e) {
+    console.error(e)
+    sendResponse(res, 500)
+  }
+}
+
 module.exports = {
   handleAllProducts,
   updateProductDetails,
   handleProduct,
   addVariantHandler,
   deleteVariantHandler,
-  deleteProductHandler
+  deleteProductHandler,
+  importCoreCatelogHandler
 }

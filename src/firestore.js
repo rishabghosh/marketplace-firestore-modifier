@@ -83,7 +83,6 @@ const getDocRef = async (field, value, tenant) => {
 }
 
 const deleteRef = (ref, tenant) => {
-  console.log(ref, tenant)
   const productCollection = getProductCollection(tenant)
   return productCollection.doc(ref).delete()
 }
