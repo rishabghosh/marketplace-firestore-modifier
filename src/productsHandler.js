@@ -118,6 +118,18 @@ const importCoreCatelogHandler = async (req, res) => {
   }
 }
 
+const deleteByRefHandler = async (req, res) => {
+  const {tenant} = req.query;
+  const {id} = req.params
+  try {
+    await deleteRef(id, tenant)
+    sendResponse(res, 204)
+  } catch (e) {
+    console.error(e)
+    sendResponse(res, 500)
+  }
+}
+
 module.exports = {
   handleAllProducts,
   updateProductDetails,
@@ -125,5 +137,6 @@ module.exports = {
   addVariantHandler,
   deleteVariantHandler,
   deleteProductHandler,
-  importCoreCatelogHandler
+  importCoreCatelogHandler,
+  deleteByRefHandler
 }
