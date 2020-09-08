@@ -5,7 +5,8 @@ const {
   getProducts,
   addVariant,
   deleteRef,
-  getDocRef
+  getDocRef,
+  isNewVariant
 } = require("./firestore")
 const {getUTCTimeStamp} = require("./dateUtils")
 const {SKU_ID_FIELD, PRODUCT_ID_FIELD} = require("./constants")
@@ -130,6 +131,19 @@ const deleteByRefHandler = async (req, res) => {
   }
 }
 
+
+const handleExperiemental = async (req, res) => {
+  const {productIds, tenant} = req.body
+
+  try {
+   const newVariant =  await isNewVariant(tenant, productIds)
+    sendResponse(res, 200, newVariant)
+  } catch (e) {
+    console.error(e)
+    sendResponse(res, 500)
+  }
+}
+
 module.exports = {
   handleAllProducts,
   updateProductDetails,
@@ -138,5 +152,6 @@ module.exports = {
   deleteVariantHandler,
   deleteProductHandler,
   importCoreCatelogHandler,
-  deleteByRefHandler
+  deleteByRefHandler,
+  handleExperiemental
 }

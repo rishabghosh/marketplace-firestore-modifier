@@ -4,7 +4,8 @@ const {
   MARKETPLACE_COLLECTION,
   PRODUCT_COLLECTION,
   ORDER_BY_FIELD,
-  PRODUCT_ID_FIELD
+  PRODUCT_ID_FIELD,
+  BU_STATUS_FIELD
 } = require("./constants")
 
 const getProductCollection = (tenant, limit, offset) => {
@@ -87,5 +88,45 @@ const deleteRef = (ref, tenant) => {
   return productCollection.doc(ref).delete()
 }
 
-module.exports = {getAllProducts, getProductRefs, updateValues, getProducts, addVariant, getDocRef, deleteRef}
+const findAllDocumentsByKeyValues = async (collection, key, values) => {
+  const valuesInChunks = chunk(values, 10);
+  const documentIds = [];
+
+  const documentReferencesInChunks = valuesInChunks.map(valueChunk => collection.where(key, 'in', valueChunk).get());
+  await Promise.all(documentReferencesInChunks)
+    .then(chunks => chunks.forEach(chunk => chunk.forEach(document => documentIds.push(document.id))))
+
+  return documentIds;
+};
+
+const isNewVariant = async (tenant, values) => {
+  const productCollection = getProductCollection(tenant)
+  const valuesInChunks = chunk(values, 10);
+  const docData = [];
+
+  const refs = valuesInChunks.map(valueChunk =>
+    productCollection
+      .where(PRODUCT_ID_FIELD, 'in', valueChunk)
+      .where(BU_STATUS_FIELD, "==", 1)
+      .get()
+  )
+
+  await Promise.all(refs)
+    .then(chunks => chunks.forEach(chunk => chunk.forEach(document => docData.push(document.data()))))
+  return values.map(value => {
+    const result = docData.find(data => data[PRODUCT_ID_FIELD] === value)
+    return {[value]: !!result}
+  })
+}
+
+module.exports = {
+  getAllProducts,
+  getProductRefs,
+  updateValues,
+  getProducts,
+  addVariant,
+  getDocRef,
+  deleteRef,
+  isNewVariant
+}
 
