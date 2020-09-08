@@ -54,4 +54,11 @@ delete: localhost:5000/product/<producdtId>?tenant=FACL
 ### delete variant
 
 delete: localhost:5000/variant/<varinantId>?tenant=FACL
+ 
+ 
+ ### import core catelog
+ 
+ post: localhost:5000/import/core-catelog?tenant=FACL
+ 
+ body : raw json from core catelog :)
 
