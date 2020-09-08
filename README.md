@@ -45,3 +45,13 @@ post: localhost:5000/variant/create
     "categoryId": "J05050101"
 }
 ```
+
+### delete product
+
+delete: localhost:5000/product/<producdtId>?tenant=FACL
+
+
+### delete variant
+
+delete: localhost:5000/variant/<varinantId>?tenant=FACL
+
